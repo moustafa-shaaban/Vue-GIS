@@ -11,7 +11,7 @@ A GIS app built using Vue, Quasar and Leaflet
 
 ### Live Preview
 
-[Vue GIS App](https://moustafashaaban.github.io/Vue-GIS/)
+[Vue GIS App](https://moustafa-shaaban.github.io/Vue-GIS/)
 
 
 ###  Project Goals
