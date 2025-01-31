@@ -7,7 +7,7 @@
             <div class="text-h5">Vue 3 Composition API Notes App</div>
             <div class="text-subtitle2 q-my-md">by Moustafa Shaaban</div>
             Contact me on:
-            <a :class="$q.dark.isActive ? 'text-white' : 'text-dark'" href="https://github.com/moustafashaaban/"
+            <a :class="$q.dark.isActive ? 'text-white' : 'text-dark'" href="https://github.com/moustafa-shaaban/"
               target="_blank">Github</a>
           </div>
         </div>
@@ -22,7 +22,8 @@
               3</a>
           </q-item>
           <q-item clickable v-ripple>
-            <a :class="$q.dark.isActive ? 'text-white' : 'text-dark'" href="https://pinia.vuejs.org//" target="_blank">Pinia</a>
+            <a :class="$q.dark.isActive ? 'text-white' : 'text-dark'" href="https://pinia.vuejs.org//"
+              target="_blank">Pinia</a>
           </q-item>
           <q-item clickable v-ripple>
             <a :class="$q.dark.isActive ? 'text-white' : 'text-dark'" href="https://vueuse.org/"
@@ -33,7 +34,8 @@
               Framework</a>
           </q-item>
           <q-item clickable v-ripple>
-            <a :class="$q.dark.isActive ? 'text-white' : 'text-dark'" href="https://leafletjs.com/" target="_blank">Leaflet JS</a>
+            <a :class="$q.dark.isActive ? 'text-white' : 'text-dark'" href="https://leafletjs.com/"
+              target="_blank">Leaflet JS</a>
           </q-item>
         </q-list>
       </q-card-section>
