@@ -44,7 +44,7 @@ export default defineConfig((ctx) => {
       // vueRouterBase,
       // vueDevtools,
 
-      // publicPath: '/',
+      publicPath: "/Vue-GIS/",
       // define: {},
       // defineEnv: {}
       // ignorePublicFolder: true,
