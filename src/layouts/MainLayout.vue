@@ -1,172 +1,138 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { Dark, date } from 'quasar';
-import { storeToRefs } from 'pinia';
-import { useFeaturesStore } from 'src/stores/features-store';
+import { useQuasar } from 'quasar';
+import ThemeToggle from '@/components/ThemeToggle.vue'
+import { useTheme } from '@/composables/useTheme';
+import { useSettingsStore } from '@/stores/settings'
+import { ref } from 'vue';
 
-defineOptions({
-  name: 'MainLayout'
-})
+const settingsStore = useSettingsStore();
 
-const leftDrawerOpen = ref(false)
-const rightDrawerOpen = ref(false)
+const currentTab = ref('home');
 
-function toggleDarkMode() {
-  Dark.toggle();
-};
+const { isDark, toggleTheme } = useTheme();
 
-const featuresStore = useFeaturesStore();
-
-const { searchQuery, features, map, featureRef } = storeToRefs(featuresStore);
-
-const filterdFeatures = computed(() => {
-  if (searchQuery.value) {
-    return features.value.filter(feature =>
-      feature.name.includes(searchQuery.value) ||
-      feature.description.includes(searchQuery.value)
-    )
-  }
-  return features.value
-})
-
-function flyToMarker(coordinates) {
-  map.value.flyTo(coordinates, 8);
-};
-
-function togglePopup(id) {
-  const featureIndex = features.value.findIndex((marker) => marker.id === id)
-  featureRef.value[featureIndex].togglePopup();
-}
-
+const $q = useQuasar();
 </script>
 
-
 <template>
-  <div class="q-pa-md">
-    <q-layout view="hHh Lpr lff" class="shadow-2 rounded-borders">
-      <q-header elevated>
-        <q-toolbar>
-          <q-btn flat dense round icon="menu" aria-label="Menu" @click="leftDrawerOpen = !leftDrawerOpen" />
+  <q-layout view="lHh Lpr lFf">
+    <q-header bordered class="main-header">
+      <q-toolbar>
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="settingsStore.toggleSideBar()" />
 
-          <q-toolbar-title>
-            <q-btn flat to="/">Vue GIS</q-btn>
-          </q-toolbar-title>
+        <q-toolbar-title>Quasar App</q-toolbar-title>
 
-          <q-btn flat @click="rightDrawerOpen = !rightDrawerOpen" round dense icon="menu" />
-        </q-toolbar>
-      </q-header>
+        <q-tabs v-if="$q.screen.gt.md" v-model="currentTab" no-caps inline-label narrow-indicator>
+          <q-route-tab name="home" icon="home" label="Home" to="/" />
+          <q-route-tab name="places" icon="location_on" label="Places" to="/places" />
+          <q-route-tab name="settings" icon="settings" label="Settings" to="/settings" />
+          <q-route-tab name="about" icon="info" label="About" to="/about" />
+        </q-tabs>
 
-      <q-drawer v-model="leftDrawerOpen" overlay bordered :width="300" :breakpoint="500">
-        <q-list class="q-py-md">
-          <q-item exact clickable v-ripple to="/">
-            <q-item-section avatar>
-              <q-icon name="home" />
-            </q-item-section>
-
-            <q-item-section>
-              Home
-            </q-item-section>
-          </q-item>
-
-          <q-item exact clickable v-ripple to="/data">
-            <q-item-section avatar>
-              <q-icon name="menu" />
-            </q-item-section>
-
-            <q-item-section>
-              Data
-            </q-item-section>
-          </q-item>
-
-          <q-item exact clickable v-ripple to="/about">
-            <q-item-section avatar>
-              <q-icon name="info" />
-            </q-item-section>
-
-            <q-item-section>
-              About
-            </q-item-section>
-          </q-item>
-
-          <q-item v-if="!Dark.isActive" clickable v-ripple @click="toggleDarkMode">
-            <q-item-section avatar>
-              <q-icon name="dark_mode" />
-            </q-item-section>
-
-            <q-item-section>
-              Dark Mode
-            </q-item-section>
-          </q-item>
-
-          <q-item v-else clickable v-ripple @click="toggleDarkMode">
-            <q-item-section avatar>
-              <q-icon name="light_mode" />
-            </q-item-section>
-
-            <q-item-section>
-              Light Mode
-            </q-item-section>
-          </q-item>
-        </q-list>
-
-        <div class="q-mini-drawer-hide absolute" style="top: 200px; left: 280px">
-          <q-btn dense round unelevated color="primary" icon="chevron_left" @click="leftDrawerOpen = !leftDrawerOpen" />
+        <div class="">
+          <ThemeToggle />
         </div>
-      </q-drawer>
+      </q-toolbar>
+    </q-header>
 
-      <q-drawer side="right" v-model="rightDrawerOpen" bordered :width="300" :breakpoint="500" overlay>
-        <q-scroll-area class="fit">
-          <div class="q-pa-lg q-gutter-md">
-            <div class="h4">
-              Data
-            </div>
-            <q-input bottom-slots v-model="searchQuery" label="Search" counter maxlength="12" dense>
-              <template v-slot:append>
-                <q-icon v-if="searchQuery !== ''" name="close" @click="searchQuery = ''" class="cursor-pointer" />
-                <q-icon name="search" />
-              </template>
+    <q-drawer v-model="settingsStore.sideBar" bordered>
+      <q-toolbar>
+        <q-toolbar-title>Menu</q-toolbar-title>
+        <q-btn flat dense round icon="close" aria-label="Menu" @click="settingsStore.toggleSideBar()" />
+      </q-toolbar>
+      <q-list padding class="menu-list">
+        <q-item exact clickable v-ripple to="/">
+          <q-item-section avatar>
+            <q-icon name="home" />
+          </q-item-section>
 
-              <template v-slot:hint>
-                Search By Feature Name or Description
-              </template>
+          <q-item-section>
+            Home
+          </q-item-section>
+        </q-item>
 
-            </q-input>
-            <q-list bordered padding class="rounded-borders" style="max-width: 450px">
-              <q-item v-for="feature in filterdFeatures" :key="feature.id">
-                <q-item-section>
-                  <q-item-label lines="1">{{ feature.name }}</q-item-label>
-                  <q-item-label caption>{{ date.formatDate(feature.dateAdded, 'DD MMMM YYYY') }}</q-item-label>
-                </q-item-section>
+        <q-item exact clickable v-ripple to="/places">
+          <q-item-section avatar>
+            <q-icon name="location_on" />
+          </q-item-section>
 
-                <q-item-section side>
-                  <q-btn size="sm" icon="flight" color="green" @click="flyToMarker(feature.coordinates)" />
-                </q-item-section>
-                <q-item-section side>
-                  <q-btn size="sm" icon="info" color="green" @click="togglePopup(feature.id)" />
-                </q-item-section>
-              </q-item>
-              <q-item v-if="features.length == 0">No Data Found</q-item>
-            </q-list>
-          </div>
-        </q-scroll-area>
+          <q-item-section>
+            Places
+          </q-item-section>
+        </q-item>
 
-        <div class="q-mini-drawer-hide absolute" style="top: 280px; right: 280px">
-          <q-btn dense round unelevated color="primary" icon="chevron_right"
-            @click="rightDrawerOpen = !rightDrawerOpen" />
-        </div>
-      </q-drawer>
+        <q-item exact clickable v-ripple to="/settings">
+          <q-item-section avatar>
+            <q-icon name="settings" />
+          </q-item-section>
 
-      <q-page-container>
-        <router-view />
-      </q-page-container>
-    </q-layout>
-  </div>
+          <q-item-section>
+            Settings
+          </q-item-section>
+        </q-item>
+
+        <q-item exact clickable v-ripple to="/about">
+          <q-item-section avatar>
+            <q-icon name="info" />
+          </q-item-section>
+
+          <q-item-section>
+            About
+          </q-item-section>
+        </q-item>
+
+        <q-item clickable v-ripple @click="toggleTheme()">
+          <q-item-section avatar>
+            <q-icon :name="isDark ? 'light_mode' : 'dark_mode'" />
+          </q-item-section>
+
+          <q-item-section v-if="isDark">
+            Light Mode
+          </q-item-section>
+
+          <q-item-section v-else>
+            Dark Mode
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-drawer>
+    <q-footer v-if="$q.screen.lt.md" :class="isDark ? 'bg-dark text-white' : 'bg-white text-black'" bordered>
+      <q-tabs v-model="currentTab" align="justify" no-caps dense outside-arrows>
+        <q-route-tab name="home" icon="home" label="Home" to="/" />
+        <q-route-tab name="places" icon="location_on" label="Places" to="/places" />
+        <q-route-tab name="settings" icon="settings" label="Settings" to="/settings" />
+        <q-route-tab name="about" icon="info" label="About" to="/about" />
+      </q-tabs>
+    </q-footer>
+
+    <q-page-container>
+      <router-view v-slot="{ Component, route }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" :key="route.path" />
+        </transition>
+      </router-view>
+    </q-page-container>
+  </q-layout>
 </template>
 
+<style scoped>
+:root.theme--light .main-header {
+  background-color: #fff;
+  color: #000;
+}
 
-<style lang="sass" scoped>
-.form-card
-  width: 350px
-  max-width: 80vw
-  margin-right: 50px
+:root.theme--dark .main-header {
+  background-color: #1d1d1d;
+  color: #fff;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

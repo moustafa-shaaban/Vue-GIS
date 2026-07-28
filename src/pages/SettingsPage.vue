@@ -1,5 +1,5 @@
 <template>
     <q-page class="flex flex-center">
-        <h4>About Page</h4>
+        <h4>Settings Page</h4>
     </q-page>
 </template>

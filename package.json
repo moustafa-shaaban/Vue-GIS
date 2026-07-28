@@ -1,36 +1,61 @@
 {
-  "name": "vue-and-leaflet",
+  "name": "vue-gis",
   "version": "0.0.1",
-  "description": "A GIS app built using Vue, Quasar and Leaflet",
-  "productName": "Vue-GIS",
-  "author": "Moustafa Shaaban <Moustafa_Shaaban@zohomail.com>",
   "private": true,
+  "description": "A Quasar Starter Project",
+  "keywords": [
+    "quasar",
+    "quasar-app",
+    "quasar-app-vite",
+    "quasar-cli",
+    "vite",
+    "vue",
+    "vuejs"
+  ],
+  "author": "Moustafa Shaaban",
+  "type": "module",
   "scripts": {
-    "test": "echo \"No test specified\" && exit 0",
+    "lint": "oxfmt && oxlint --fix",
+    "lint:check": "oxfmt --check && oxlint",
     "dev": "quasar dev",
-    "build": "quasar build"
+    "build": "quasar build",
+    "postinstall": "quasar prepare --silent"
   },
   "dependencies": {
-    "@quasar/extras": "^1.16.4",
-    "@vueuse/core": "^10.9.0",
-    "leaflet-geosearch": "^4.0.0",
-    "leaflet.fullscreen": "^3.0.2",
-    "leaflet.locatecontrol": "^0.81.0",
-    "nanoid": "^5.0.7",
-    "pinia": "^2.0.11",
-    "quasar": "^2.8.0",
-    "vue": "^3.4.18",
-    "vue-router": "^4.0.12"
+    "@quasar/extras": "^2.0.0",
+    "@tanstack/vue-form": "^1.33.0",
+    "@tanstack/vue-query": "^5.101.0",
+    "@vueuse/core": "^14.3.0",
+    "@vueuse/rxjs": "^14.3.0",
+    "axios": "^1.18.0",
+    "dexie": "^4.4.4",
+    "dexie-export-import": "^4.4.0",
+    "downloadjs": "^1.4.7",
+    "leaflet": "^1.9.4",
+    "leaflet-geosearch": "^4.4.0",
+    "leaflet.fullscreen": "^5.3.3",
+    "leaflet.locatecontrol": "^0.90.0",
+    "ol": "^10.9.0",
+    "ol-geocoder": "^4.3.3",
+    "pinia": "^3.0.1",
+    "pinia-plugin-persistedstate": "^4.7.1",
+    "quasar": "^2.20.0",
+    "rxjs": "^7.8.2",
+    "vue": "^3.5.22",
+    "vue-i18n": "^11.3.0",
+    "vue-router": "^5.0.6",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@quasar/app-vite": "^1.4.3",
-    "autoprefixer": "^10.4.2",
-    "leaflet": "^1.9.4",
-    "postcss": "^8.4.14"
+    "@intlify/unplugin-vue-i18n": "^11.0.0",
+    "@quasar/app-vite": "^3.0.0-rc.3",
+    "autoprefixer": "^10.4.27",
+    "oxfmt": "^0.x",
+    "oxlint": "^1.x",
+    "postcss": "^8.5.8"
   },
   "engines": {
-    "node": "^20 || ^18 || ^16",
-    "npm": ">= 6.13.4",
-    "yarn": ">= 1.21.1"
-  }
+    "node": ">= 26 || ^24 || ^22.12"
+  },
+  "productName": "Quasar App"
 }

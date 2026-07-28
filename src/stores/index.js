@@ -1,6 +1,6 @@
-import { store } from 'quasar/wrappers'
+import { defineStore } from '#q-app'
 import { createPinia } from 'pinia'
-
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 /*
  * If not building with SSR mode, you can
  * directly export the Store instantiation;
@@ -10,11 +10,11 @@ import { createPinia } from 'pinia'
  * with the Store instance.
  */
 
-export default store((/* { ssrContext } */) => {
+export default defineStore((/* { ssrContext } */) => {
   const pinia = createPinia()
 
   // You can add Pinia plugins here
   // pinia.use(SomePiniaPlugin)
-
+  pinia.use(piniaPluginPersistedstate)
   return pinia
 })
