@@ -23,9 +23,9 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm quasar build
+          cache: npm
+      - run: npm install
+      - run: npm quasar build
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist/spa
