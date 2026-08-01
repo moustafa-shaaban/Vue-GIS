@@ -5,11 +5,12 @@ import { from, useObservable } from '@vueuse/rxjs'
 import { liveQuery } from 'dexie'
 import { exportDB, importDB } from 'dexie-export-import'
 import download from 'downloadjs'
-import { useQuasar } from 'quasar'
+import { date, useQuasar } from 'quasar'
 
 import { db } from '@/db/index.js'
 import { fieldSchema, featureSchema } from '@/schemas'
 import { confirmDeleteFeature } from '@/utils'
+import { errorNotification, successNotification } from '@/utils/notifications'
 
 const $q = useQuasar()
 
@@ -96,18 +97,18 @@ function deleteSelected() {
         const ids = selected.value.map(row => row.id)
         await db.features.bulkDelete(ids)
         selected.value = []
-        $q.notify({ type: 'positive', message: `${ids.length} feature(s) deleted`, icon: 'delete' })
+        successNotification(`${ids.length} feature(s) deleted`)
     })
 }
 
 async function exportData() {
     try {
         const blob = await exportDB(db, { prettyJson: true })
-        const today = new Date().toLocaleDateString()
-        download(blob, `dexie-export-${today}.json`, 'application/json')
+        const today = date.formatDate(Date.now(), 'YYYY-MM-DDTHH:mm:ss')
+        download(blob, `features-export-${today}.json`, 'application/json')
+        successNotification('Features exported successfully')
     } catch (error) {
-        $q.notify({ type: 'negative', message: 'Export failed' })
-        console.error('' + error)
+        errorNotification('Export failed')
     }
 }
 
@@ -116,9 +117,9 @@ async function importData(file) {
 
     try {
         await importDB(file)
-        $q.notify({ type: 'positive', message: 'Import successful', icon: 'check' })
+        successNotification('Features imported successfully')
     } catch (err) {
-        $q.notify({ type: 'negative', message: 'Import failed' })
+        errorNotification('Import failed')
         console.error('Import failed:', err)
     }
 }

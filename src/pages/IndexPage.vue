@@ -12,6 +12,7 @@ import { LocateControl } from 'leaflet.locatecontrol';
 import { db } from '@/db';
 import { featureSchema, fieldSchema } from '@/schemas';
 import { confirmDeleteFeature } from '@/utils';
+import { errorNotification, successNotification } from '@/utils/notifications';
 
 const $q = useQuasar();
 
@@ -61,23 +62,37 @@ const form = useForm({
     try {
       if (isEditing.value) {
         await db.features.update(editingId.value, value);
+        successNotification('Feature Updated Successfully')
       } else {
         await db.features.add(value);
+        successNotification('Feature Created Successfully')
       }
       formDialog.value = false;
       cancelEdit();
     } catch (error) {
       console.error(error);
-      Notify.create({
-        type: 'negative',
-        message: 'Failed to save feature'
-      });
+      errorNotification('Failed to save feature')
     }
   },
 });
 
+function showError(field) {
+  return field.state.meta.isTouched && field.state.meta.errors.length > 0
+}
+
+function errorMessage(field) {
+  if (!showError(field)) return ''
+  return field.state.meta.errors[0]?.message ?? field.state.meta.errors[0]
+}
+
 function submit() {
   form.handleSubmit();
+}
+
+function resetForm() {
+  form.reset();
+  form.validate()
+  clearDraftMarker()
 }
 
 function add() {
@@ -310,7 +325,7 @@ onUnmounted(() => {
       </q-toolbar>
 
       <div class="q-pa-sm">
-        <q-input v-model="searchQuery" dense outlined placeholder="Search features..." clearable>
+        <q-input v-model="searchQuery" dense filled placeholder="Search features..." clearable>
           <template v-slot:prepend>
             <q-icon name="search" />
           </template>
@@ -346,73 +361,100 @@ onUnmounted(() => {
     </div>
 
     <q-dialog v-model="formDialog" persistent seamless position="right" @hide="stopPickingLocation">
-      <q-card class="q-pa-md" style="width: 380px; max-width: 90vw;">
+      <q-card class="q-pa-md" style="width: 440px; max-width: 90vw;">
         <q-toolbar>
           <q-toolbar-title>{{ editingId ? 'Edit Feature' : 'Add Feature' }}</q-toolbar-title>
           <q-btn flat round dense icon="close" v-close-popup />
         </q-toolbar>
 
-        <form @submit.prevent.stop="submit">
-          <form.Field name="title" :validators="{ onBlur: fieldSchema.title }">
-            <template #default="{ field }">
-              <q-input :model-value="field.state.value" @update:model-value="field.handleChange"
-                @blur="field.handleBlur" label="Title" placeholder="Cafe.." :disable="form.state.isSubmitting" outlined
-                class="q-mb-sm" stack-label :error="field.state.meta.errors.length > 0"
-                :error-message="field.state.meta.errors[0]?.message ?? field.state.meta.errors[0]" />
-            </template>
-          </form.Field>
+        <q-separator />
 
-          <form.Field name="description" :validators="{ onBlur: fieldSchema.description }">
-            <template #default="{ field }">
-              <q-input type="textarea" :model-value="field.state.value" @update:model-value="field.handleChange"
-                @blur="field.handleBlur" label="Description" placeholder="My favorite cafe"
-                :disable="form.state.isSubmitting" outlined class="q-mb-sm" stack-label
-                :error="field.state.meta.errors.length > 0"
-                :error-message="field.state.meta.errors[0]?.message ?? field.state.meta.errors[0]" />
-            </template>
-          </form.Field>
+        <q-card-section>
 
-          <div class="row items-start q-col-gutter-sm q-mb-sm">
-            <div class="col">
-              <form.Field name="latitude" :validators="{ onBlur: fieldSchema.latitude }">
+          <form @submit.prevent.stop="submit">
+            <div class="column q-gutter-md">
+
+
+              <form.Field name="title" :validators="{ onBlur: fieldSchema.title, onMount: fieldSchema.title }">
                 <template #default="{ field }">
-                  <q-input type="number" :model-value="field.state.value" @update:model-value="field.handleChange"
-                    @blur="field.handleBlur" label="Latitude" placeholder="70.123456" :disable="form.state.isSubmitting"
-                    outlined stack-label :error="field.state.meta.errors.length > 0"
-                    :error-message="field.state.meta.errors[0]?.message ?? field.state.meta.errors[0]" />
+                  <q-input :model-value="field.state.value" @update:model-value="field.handleChange"
+                    @blur="field.handleBlur" label="Title" placeholder="Cafe.." :disable="form.state.isSubmitting"
+                    filled stack-label :error="showError(field)" :error-message="errorMessage(field)" bottom-slots />
                 </template>
               </form.Field>
-            </div>
-            <div class="col">
-              <form.Field name="longitude" :validators="{ onBlur: fieldSchema.longitude }">
+
+              <form.Field name="description"
+                :validators="{ onBlur: fieldSchema.description, onMount: fieldSchema.description }">
                 <template #default="{ field }">
-                  <q-input type="number" :model-value="field.state.value" @update:model-value="field.handleChange"
-                    @blur="field.handleBlur" label="Longitude" placeholder="-20.123456"
-                    :disable="form.state.isSubmitting" outlined stack-label :error="field.state.meta.errors.length > 0"
-                    :error-message="field.state.meta.errors[0]?.message ?? field.state.meta.errors[0]" />
+                  <q-input type="textarea" :model-value="field.state.value" @update:model-value="field.handleChange"
+                    @blur="field.handleBlur" label="Description" placeholder="My favorite cafe"
+                    :disable="form.state.isSubmitting" filled stack-label :error="showError(field)"
+                    :error-message="errorMessage(field)" bottom-slots />
                 </template>
               </form.Field>
+
+              <q-separator spaced />
+
+              <div class="text-subtitle2 text-grey-8">
+                Location
+              </div>
+
+              <div class="row q-col-gutter-md">
+
+
+                <div class="row items-start q-col-gutter-sm">
+                  <div class="col">
+                    <form.Field name="latitude"
+                      :validators="{ onBlur: fieldSchema.latitude, onMount: fieldSchema.latitude }">
+                      <template #default="{ field }">
+                        <q-input type="number" :model-value="field.state.value" @update:model-value="field.handleChange"
+                          @blur="field.handleBlur" label="Latitude" placeholder="70.123456"
+                          :disable="form.state.isSubmitting || pickingLocation" filled stack-label
+                          :error="showError(field)" :error-message="errorMessage(field)" bottom-slots />
+                      </template>
+                    </form.Field>
+                  </div>
+                  <div class="col">
+                    <form.Field name="longitude"
+                      :validators="{ onBlur: fieldSchema.longitude, onMount: fieldSchema.longitude }">
+                      <template #default="{ field }">
+                        <q-input type="number" :model-value="field.state.value" @update:model-value="field.handleChange"
+                          @blur="field.handleBlur" label="Longitude" placeholder="-20.123456"
+                          :disable="form.state.isSubmitting || pickingLocation" filled stack-label
+                          :error="showError(field)" :error-message="errorMessage(field)" bottom-slots />
+                      </template>
+                    </form.Field>
+                  </div>
+                </div>
+              </div>
+
+              <q-btn class="q-mb-md full-width" unelevated icon="my_location" color="secondary"
+                :color="pickingLocation ? 'primary' : 'secondary'"
+                :label="pickingLocation ? 'Click the map to set location…' : 'Pick location on map'"
+                @click="pickingLocation ? stopPickingLocation() : startPickingLocation()" />
+
+              <div class="row q-gutter-sm">
+                <form.Subscribe>
+                  <template v-slot="{ canSubmit, isSubmitting }">
+                    <q-btn color="primary" unelevated type="submit" :disable="!canSubmit"
+                      :label="isSubmitting ? 'Saving...' : 'Save'" />
+                  </template>
+                </form.Subscribe>
+                <q-space />
+                <q-btn flat color="grey" label="Cancel" @click="formDialog = false; cancelEdit()" />
+                <q-btn label="Reset" flat @click="resetForm" />
+              </div>
             </div>
-          </div>
-
-          <q-btn class="q-mb-md full-width" outline dense icon="my_location"
-            :color="pickingLocation ? 'primary' : 'grey-7'"
-            :label="pickingLocation ? 'Click the map to set location…' : 'Pick location on map'"
-            @click="pickingLocation ? stopPickingLocation() : startPickingLocation()" />
-
-          <div class="row q-gutter-sm">
-            <form.Subscribe>
-              <template v-slot="{ canSubmit, isSubmitting }">
-                <q-btn color="primary" type="submit" :disable="!canSubmit"
-                  :label="isSubmitting ? 'Saving...' : 'Save'" />
-              </template>
-            </form.Subscribe>
-            <q-btn flat color="grey" label="Cancel" @click="formDialog = false; cancelEdit()" />
-            <q-space />
-            <q-btn label="Reset" flat @click="form.reset" />
-          </div>
-        </form>
+          </form>
+        </q-card-section>
       </q-card>
     </q-dialog>
   </q-page>
 </template>
+
+<style scoped>
+.q-field__bottom {
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+</style>

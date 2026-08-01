@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { Dialog, Notify } from "quasar";
+import { errorNotification, successNotification } from "./notifications";
 
 export function confirmDeleteFeature(id) {
   Dialog.create({
@@ -23,17 +24,9 @@ export function confirmDeleteFeature(id) {
   }).onOk(async () => {
     try {
       await db.features.delete(id);
-      Notify.create({
-        message: "Feature Deleted Successfully",
-        type: "positive",
-        actions: [{ icon: "close", color: "white", round: true }],
-      });
+      successNotification("Feature Deleted Successfully");
     } catch (error) {
-      Notify.create({
-        message: error.message,
-        type: "negative",
-        actions: [{ icon: "close", color: "white", round: true }],
-      });
+      errorNotification(error.message);
     }
   });
 }
