@@ -8,6 +8,7 @@ import { liveQuery } from 'dexie'
 import L from "leaflet";
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import { LocateControl } from 'leaflet.locatecontrol';
+import { maplibreGL } from '@maplibre/maplibre-gl-leaflet'
 
 import { db } from '@/db';
 import { featureSchema, fieldSchema } from '@/schemas';
@@ -248,11 +249,9 @@ onMounted(async () => {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   });
 
-  let cartoDBDarkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  });
+  let openfreemapDark = maplibreGL({ style: 'https://tiles.openfreemap.org/styles/dark' });
 
-  let baseLayer = $q.dark.isActive ? cartoDBDarkMatter : osm;
+  let baseLayer = $q.dark.isActive ? openfreemapDark : osm;
 
   map.value = L.map(mapContainer.value, {
     minZoom: 2,
@@ -266,16 +265,16 @@ onMounted(async () => {
   watch(() => $q.dark.isActive, (isDark) => {
     if (isDark) {
       map.value.removeLayer(osm);
-      cartoDBDarkMatter.addTo(map.value);
+      openfreemapDark.addTo(map.value);
     } else {
-      map.value.removeLayer(cartoDBDarkMatter);
+      map.value.removeLayer(openfreemapDark);
       osm.addTo(map.value);
     }
   });
 
   let baseMaps = {
     "OpenStreetMap": osm,
-    "CartoDB.DarkMatter": cartoDBDarkMatter,
+    "CartoDB.DarkMatter": openfreemapDark,
   };
 
   L.control.layers(baseMaps).addTo(map.value);

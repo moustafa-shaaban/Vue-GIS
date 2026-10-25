@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { Dialog, Notify } from "quasar";
+import { Dialog } from "quasar";
 import { errorNotification, successNotification } from "./notifications";
 
 export function confirmDeleteFeature(id) {

@@ -22,6 +22,7 @@
     "postinstall": "quasar prepare --silent"
   },
   "dependencies": {
+    "@maplibre/maplibre-gl-leaflet": "^0.1.4",
     "@quasar/extras": "^2.0.0",
     "@tanstack/vue-form": "^1.33.0",
     "@tanstack/vue-query": "^5.101.0",
@@ -35,6 +36,7 @@
     "leaflet-geosearch": "^4.4.0",
     "leaflet.fullscreen": "^5.3.3",
     "leaflet.locatecontrol": "^0.90.0",
+    "maplibre-gl": "^6.15.0",
     "ol": "^10.9.0",
     "ol-geocoder": "^4.3.3",
     "pinia": "^3.0.1",

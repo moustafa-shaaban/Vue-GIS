@@ -19,8 +19,15 @@ L.Icon.Default.prototype.options.iconUrl = markerIconUrl;
 L.Icon.Default.prototype.options.iconRetinaUrl = markerIconRetinaUrl;
 L.Icon.Default.prototype.options.shadowUrl = markerShadowUrl;
 L.Icon.Default.imagePath = "";
+import { maplibreGL } from '@maplibre/maplibre-gl-leaflet'
+import { setWorkerUrl } from 'maplibre-gl'
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
+import 'maplibre-gl/dist/maplibre-gl.css'
 
 import { useTheme } from './composables/useTheme'
+
+// Vite worker setup
+setWorkerUrl(workerUrl)
 
 const $q = useQuasar()
 const { isDark } = useTheme()
