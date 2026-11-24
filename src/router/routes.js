@@ -6,12 +6,12 @@ const routes = [
       {
         name: "home",
         path: "",
-        component: () => import("@/pages/IndexPage.vue"),
+        component: () => import("@/pages/IndexPage2.vue"),
       },
       {
         name: "places",
         path: "places",
-        component: () => import("@/pages/PlacesPage.vue"),
+        component: () => import("@/pages/PlacesPage2.vue"),
       },
       {
         name: "settings",
